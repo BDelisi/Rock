@@ -4361,6 +4361,7 @@ MonoBehaviour:
   sprintMultiplier: 1.5
   isGrounded: 0
   rightHand: {fileID: 3004680226096609005}
+  healthTMP: {fileID: 0}
   orientation: {fileID: 4474047774432133559}
 --- !u!114 &1215538792228706700
 MonoBehaviour:
@@ -4591,10 +4592,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.5
-  m_Height: 2
+  m_Radius: 0.6
+  m_Height: 2.0915565
   m_Direction: 1
-  m_Center: {x: 0, y: 1, z: 0}
+  m_Center: {x: 0, y: 1.0457783, z: 0}
 --- !u!1 &8164561883707761141
 GameObject:
   m_ObjectHideFlags: 0

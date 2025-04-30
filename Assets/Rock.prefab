@@ -146,8 +146,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isHeld: 0
   size: 0
-  sizeRange: {x: 8, y: 24}
-  damageMultiplier: 0.75
+  sizeRange: {x: 8, y: 32}
+  damageMultiplier: 0.5
+  speedMultiplier: 1.6
+  massWeight: 1.05
+  maxAirTime: 2
 --- !u!135 &2506214548236527774
 SphereCollider:
   m_ObjectHideFlags: 0

@@ -94,7 +94,7 @@ public class PlayerController : MonoBehaviour
     {
         if (heldRock != null)
         {
-            heldRock.GetComponent<Rock>().Throw(myCam.transform.position + myCam.transform.rotation * new Vector3(0, 0, 1f) , myCam.transform.rotation);
+            heldRock.GetComponent<Rock>().Throw(myCam.transform.position + myCam.transform.rotation * new Vector3(0, 0, .6f)  + myCam.transform.rotation * new Vector3(0, 0, 1f) * (heldRock.GetComponent<Rock>().size/20), myCam.transform.rotation);
             heldRock.transform.parent = null;
             heldRock = null;
         }
@@ -137,8 +137,8 @@ public class PlayerController : MonoBehaviour
 
     public void TakeDamage(float amount)
     {
+        Debug.Log(amount);
         health -= amount;
-        //Debug.Log(health);
         healthTMP.SetText(Math.Round(health).ToString());
         if (health < 0)
         {
