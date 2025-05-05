@@ -1,12 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEditor.Progress;
 
 public class RockPickup : MonoBehaviour
 {
     public List<GameObject> pickups = new List<GameObject>();
     public GameObject selected = null;
+    public Color color;
 
     // Start is called before the first frame update
     void Start()
@@ -20,6 +20,10 @@ public class RockPickup : MonoBehaviour
         float distance= 100;
         foreach (var item in pickups)
         {
+            if (item == null)
+            {
+                pickups.Remove(item);
+            }
             if (Vector3.Distance(transform.position, item.transform.position) < distance && !item.GetComponent<Rock>().isHeld)
             {
                 distance = Vector3.Distance(transform.position, item.transform.position);
@@ -28,11 +32,17 @@ public class RockPickup : MonoBehaviour
         }
         if (selected != null)
         {
-            selected.GetComponent<Outline>().enabled = false;
+            Outline theOutLine = selected.GetComponent<Outline>();
+            //theOutLine.OutlineWidth = 0;
+            theOutLine.enabled = false;
         }
         if (farthest != null)
         {
-            farthest.GetComponent<Outline>().enabled = true;
+            Outline theOutLine = farthest.GetComponent<Outline>();
+            //theOutLine.OutlineColor = color;
+            //theOutLine.OutlineWidth = 10;
+            theOutLine.enabled = true;
+
         }
         selected = farthest;
     }

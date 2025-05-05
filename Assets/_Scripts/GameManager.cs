@@ -11,13 +11,12 @@ public class GameManager : MonoBehaviour
     {
         for (int i = 0; i < rocks; i++)
         {
-            Instantiate(rock, transform.position, Quaternion.identity);
+            SpawnRock();
         }
     }
 
-    // Update is called once per frame
-    void Update()
+    public void SpawnRock()
     {
-        
+        Instantiate(rock, transform.position, Quaternion.identity);
     }
 }

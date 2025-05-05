@@ -3,14 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Mathematics;
-using UnityEditor;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
-using static UnityEditor.PlayerSettings;
-using static UnityEditor.Progress;
 
 public class PlayerController : MonoBehaviour
 {
@@ -23,6 +19,8 @@ public class PlayerController : MonoBehaviour
     public GameObject rightHand;
     public TextMeshProUGUI healthTMP;
     public Transform orientation;
+    public Vector2 moveDirection = Vector2.zero;
+    public AudioClip hurt;
 
     private Camera myCam;
     private Rigidbody rb;
@@ -30,9 +28,9 @@ public class PlayerController : MonoBehaviour
     private GameObject heldRock = null;
     private CapsuleCollider capsuleCollider;
     private PlayerInput playerInput;
+    private AudioManager audioManager;
     private float xRot = 0;
     private float yRot = 0;
-    private Vector2 moveDirection = Vector2.zero;
     private float inputX;
     private float inputY;
     // Start is called before the first frame update
@@ -46,6 +44,7 @@ public class PlayerController : MonoBehaviour
         capsuleCollider = GetComponent<CapsuleCollider>();
         animator = GetComponent<Animator>();
         yRot = transform.rotation.eulerAngles.y;
+        audioManager = FindFirstObjectByType<AudioManager>();
     }
 
     // Update is called once per frame
@@ -142,8 +141,22 @@ public class PlayerController : MonoBehaviour
         healthTMP.SetText(Math.Round(health).ToString());
         if (health < 0)
         {
-            animator.Play("Death");
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            Death();
         }
+        audioManager.playSound(0f, hurt, 1f, 1f);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Water"))
+        {
+            Debug.Log("Hit water");
+        }
+    }
+
+    public void Death()
+    {
+        animator.Play("Death");
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

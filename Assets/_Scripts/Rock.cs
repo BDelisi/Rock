@@ -12,16 +12,21 @@ public class Rock : MonoBehaviour
     public float damageMultiplier = .75f;
     public float speedMultiplier = 1.0f;
     public float massWeight = 1.0f;
+    public float timeWeight = 1.0f;
     public float maxAirTime = 2.0f;
+    public AudioClip hitSound;
+    public AudioClip bonk;
 
     private Rigidbody rb;
     private Collider coll;
-    private float velo;
+    private AudioManager audioManager;
+    private Vector3 velo;
     private float timeInAir;
     private bool inAir = false;
     // Start is called before the first frame update
     void Start()
     {
+        audioManager = FindFirstObjectByType<AudioManager>();
         rb = GetComponent<Rigidbody>();
         coll = GetComponent<Collider>();
         size = UnityEngine.Random.Range(sizeRange.x, sizeRange.y);
@@ -39,11 +44,6 @@ public class Rock : MonoBehaviour
                 timeInAir = maxAirTime;
             }
         }
-    }
-
-    private void FixedUpdate()
-    {
-        velo = rb.velocity.magnitude * rb.mass;
     }
 
     public void PickedUp()
@@ -64,7 +64,7 @@ public class Rock : MonoBehaviour
         gameObject.layer = 6;
         inAir = true;
         rb.AddForce(transform.forward * 2000 * speedMultiplier);
-        velo = rb.velocity.magnitude;
+        velo = rb.velocity;
         timeInAir = Time.deltaTime + .2f;
     }
 
@@ -75,17 +75,22 @@ public class Rock : MonoBehaviour
             if (collision.gameObject.layer == 3 || collision.gameObject.layer == 6)
             {
                 inAir = false;
+                audioManager.playSound(transform.position, hitSound, 1 - size/46, 1f);
                 //Debug.Log(momentum.magnitude * timeInAir * damageMultiplier);
             }
             else if (collision.gameObject.CompareTag("Player"))
             {
                 //Debug.Log(size + " " + velo);
 
-                if (timeInAir > .35f)
+                if (timeInAir > .4f)
                 {
-                    collision.gameObject.GetComponent<PlayerController>().TakeDamage(velo * math.pow(size/8, massWeight) * timeInAir * damageMultiplier);
+                    collision.gameObject.GetComponent<PlayerController>().TakeDamage(math.pow((size/8) + 1, massWeight) * math.pow(timeInAir, timeWeight) * damageMultiplier);
+                    audioManager.playSound(transform.position, bonk, 1f , 1f);
                 }
-                //collision.rigidbody.velocity += new Vector3(collision.impulse.y, 0, collision.impulse.x) * -10;
+                //collision.rigidbody.AddForce(transform.rotation * Quaternion.FromToRotation(transform.position, collision.transform.position) * Vector3.forward * velo * math.pow(size/8, massWeight));
+                //collision.rigidbody.AddForceAtPosition(velo * math.pow(size / 8, massWeight), collision.contacts[0].point);
+                //Debug.Log(collision.impulse);
+                //collision.rigidbody.AddForce(new Vector3(collision.impulse.x * -500,collision.impulse.y * -5, collision.impulse.z * -500));
                 //Debug.Log(collision.impulse);
                 inAir = false;
             }
