@@ -17,6 +17,6 @@ public class SoundPlayer : MonoBehaviour
         source.pitch = pitch;
         source.volume = volume;
         source.Play();
-        //Destroy(gameObject, sound.length);
+        Destroy(gameObject, sound.length);
     }
 }

@@ -29,10 +29,13 @@ public class PlayerController : MonoBehaviour
     private CapsuleCollider capsuleCollider;
     private PlayerInput playerInput;
     private AudioManager audioManager;
+    private LayerMask layerMask;
     private float xRot = 0;
     private float yRot = 0;
     private float inputX;
     private float inputY;
+    private float jumpCD = 0f;
+    private float grabCD = 0f;
     // Start is called before the first frame update
     void Start()
     {
@@ -43,31 +46,45 @@ public class PlayerController : MonoBehaviour
         playerInput = GetComponent<PlayerInput>();
         capsuleCollider = GetComponent<CapsuleCollider>();
         animator = GetComponent<Animator>();
-        yRot = transform.rotation.eulerAngles.y;
+        yRot = 1 - (transform.rotation.eulerAngles.y/180);
         audioManager = FindFirstObjectByType<AudioManager>();
+        layerMask = LayerMask.GetMask("Ground", "Rock");
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (playerInput.actions["Sprint"].IsPressed())
+        if (moveDirection.magnitude != 0)
         {
-            animator.SetBool("Running", true);
-            rb.AddForce(transform.rotation * new Vector3(moveDirection.x, 0, moveDirection.y) * moveSpeed * Time.deltaTime * sprintMultiplier);
-        }
-        else
-        {
-            animator.SetBool("Running", false);
-            rb.AddForce(transform.rotation * new Vector3(moveDirection.x, 0, moveDirection.y) * moveSpeed * Time.deltaTime);
+            if (playerInput.actions["Sprint"].IsPressed())
+            {
+                animator.SetBool("Running", true);
+                rb.AddForce(transform.rotation * new Vector3(moveDirection.x, 0, moveDirection.y) * moveSpeed * Time.deltaTime * sprintMultiplier);
+            }
+            else
+            {
+                animator.SetBool("Running", false);
+                rb.AddForce(transform.rotation * new Vector3(moveDirection.x, 0, moveDirection.y) * moveSpeed * Time.deltaTime);
+            }
         }
         yRot += inputX;
         xRot -= inputY;
         xRot = math.clamp(xRot, -.95f, .95f);
         transform.rotation = quaternion.Euler(0, yRot, 0);
         orientation.rotation = quaternion.Euler(xRot, yRot, 0);
-        float radius = capsuleCollider.radius * 1f;
-        LayerMask layerMask = LayerMask.GetMask("Ground", "Rock");
-        isGrounded = Physics.CheckSphere(transform.position + Vector3.up * (radius * .8f), radius, layerMask);
+        if(jumpCD > 0 )
+        {
+            jumpCD -= Time.deltaTime;
+        }
+        if (grabCD > 0)
+        {
+            grabCD -= Time.deltaTime;
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        isGrounded = Physics.CheckSphere(transform.position + Vector3.up * (capsuleCollider.radius * .8f), capsuleCollider.radius * 1f, layerMask);
         animator.SetBool("Grounded", isGrounded);
     }
 
@@ -107,7 +124,7 @@ public class PlayerController : MonoBehaviour
     public void Interact(InputAction.CallbackContext context)
     {
         //Debug.Log(context);
-        if (context.started)
+        if (context.started && grabCD <= 0f)
         {
             GameObject rockToPick = myCam.GetComponent<RockPickup>().selected;
             if (rockToPick != null && heldRock == null)
@@ -123,9 +140,10 @@ public class PlayerController : MonoBehaviour
     public void Jump(InputAction.CallbackContext context)
     {
         //Debug.Log(context);
-        if (context.started && isGrounded)
+        if (context.started && isGrounded && jumpCD <= 0)
         {
             rb.AddForce(new Vector3(0, 3500, 0));
+            jumpCD = .2f;
         }
     }
 
