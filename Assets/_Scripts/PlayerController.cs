@@ -46,7 +46,7 @@ public class PlayerController : MonoBehaviour
         playerInput = GetComponent<PlayerInput>();
         capsuleCollider = GetComponent<CapsuleCollider>();
         animator = GetComponent<Animator>();
-        yRot = 1 - (transform.rotation.eulerAngles.y/180);
+        yRot = 1 - math.radians(transform.rotation.eulerAngles.y);
         audioManager = FindFirstObjectByType<AudioManager>();
         layerMask = LayerMask.GetMask("Ground", "Rock");
     }
